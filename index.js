@@ -123,7 +123,7 @@ app.get("/messages",(req,res)=>{
         return;
     }
     else{
-        db.collection("messages").find({$or:[{to:user},{to:"Public"},{from:user}]}).sort({"_id":-1}).limit(limit).toArray().then(messages=>{
+        db.collection("messages").find({$or:[{to:user},{to:"Todos"},{from:user}]}).sort({"_id":-1}).limit(limit).toArray().then(messages=>{
             if(messages.length === 0){
                 res.status(404).send();
             }
@@ -151,7 +151,24 @@ app.post("/status",(req,res)=>{
     });
 })
 
-
+setInterval(()=>{
+    let horario = Date.now();
+    db.collection("users").find().toArray().then(users=>{
+        users.forEach(user => {
+            if(horario - user.lastStatus > 10000){
+                db.collection("users").deleteOne({name:user.name}).then(()=>{
+                    db.collection("messages").insertOne({
+                        from: user.name,
+                        to: 'Todos',
+                        text: 'sai da sala...',
+                        type: 'status',
+                        time: dayjs(horario).format('HH:mm:ss') 
+                    })
+                })
+            }
+        });
+    });
+},15000)
 
 
 
