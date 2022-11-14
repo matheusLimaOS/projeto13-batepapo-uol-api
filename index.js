@@ -3,12 +3,14 @@ import cors from "cors";
 import { MongoClient } from "mongodb";
 import joi from 'joi';
 import dayjs from "dayjs";
+import dotenv from "dotenv";
 const app = express();
+dotenv.config();
 
 app.use(express.json())
 app.use(cors())
 
-const mongoClient = new MongoClient("mongodb://localhost:27017");
+const mongoClient = new MongoClient(process.env.MONGO_URL);
 let db;
 
 mongoClient.connect().then(() => {
